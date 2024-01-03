@@ -40,7 +40,7 @@ class ScrapboxDiaryFeed
   private
   def select_diary_itemes
     @_diary_items ||= original_feed.items.select {|item|
-      item.description =~ /#日記/ && item.title =~ /^2023/ && item.title !~ /\(WIP\)/
+      item.description =~ /#日記/ && item.title =~ /^\d{4}-\d{2}-\d{2}/ && item.title !~ /\(WIP\)/
     }.map {|item|
       item.title = item.title.split(' - ').first
       item
