@@ -1,0 +1,9 @@
+version: 2
+updates:
+  # GitHub Actionsの依存関係を維持する
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    reviewers:
+      - "kenchan"
