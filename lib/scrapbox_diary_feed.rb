@@ -14,7 +14,7 @@ class ScrapboxDiaryFeed
   end
 
   def items
-    @_items ||= select_diary_itemes
+    @_items ||= select_diary_items
   end
 
   def title
@@ -38,7 +38,7 @@ class ScrapboxDiaryFeed
   end
 
   private
-  def select_diary_itemes
+  def select_diary_items
     @_diary_items ||= original_feed.items.select {|item|
       item.description =~ /#日記/ && item.title =~ /^\d{4}-\d{2}-\d{2}/ && item.title !~ /\(WIP\)/
     }.map {|item|
