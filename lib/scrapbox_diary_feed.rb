@@ -1,6 +1,7 @@
 require 'net/http'
 require 'rss'
 require 'uri'
+require 'date'
 
 class ScrapboxDiaryFeed
   attr_reader :project_name
@@ -39,10 +40,26 @@ class ScrapboxDiaryFeed
 
   private
   def select_diary_items
+    today = Date.today
     @_diary_items ||= original_feed.items.select {|item|
-      item.description =~ /#日記/ && item.title =~ /^\d{4}-\d{2}-\d{2}/ && item.title !~ /\(WIP\)/
+      item.description =~ /#日記/ && item.title !~ /\(WIP\)/
     }.map {|item|
-      item.title = item.title.split(' - ').first
+      # description内の#YYYY-MM-DDタグから日付を抽出
+      match = item.description.match(/#(\d{4}-\d{2}-\d{2})/)
+      next unless match
+
+      date_str = match[1]
+      date = Date.parse(date_str)
+      # 過去30日以内の日記のみ
+      next unless (today - date).to_i <= 30
+
+      # pubDateを日記の日付に設定（RSS仕様との整合性のため）
+      item.pubDate = date.to_time
+      item.title = date_str
+      [item, date]
+    }.compact.sort_by {|item, date|
+      -date.to_time.to_i  # 日付の降順
+    }.map {|item, date|
       item
     }
   end
