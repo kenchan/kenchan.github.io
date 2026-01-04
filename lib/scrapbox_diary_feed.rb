@@ -35,7 +35,13 @@ class ScrapboxDiaryFeed
   end
 
   def original_feed
-    @_original_feed ||= RSS::Parser.parse(Net::HTTP.get(URI.parse(url)))
+    @_original_feed ||= begin
+      response = Net::HTTP.get(URI.parse(url))
+      RSS::Parser.parse(response)
+    rescue StandardError => e
+      warn "Failed to fetch or parse feed from #{url}: #{e.message}"
+      raise
+    end
   end
 
   private
