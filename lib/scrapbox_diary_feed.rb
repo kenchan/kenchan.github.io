@@ -4,6 +4,8 @@ require 'uri'
 require 'date'
 
 class ScrapboxDiaryFeed
+  DAYS_TO_KEEP = 30
+
   attr_reader :project_name
 
   def initialize(project_name)
@@ -55,7 +57,7 @@ class ScrapboxDiaryFeed
 
       date_str = match[1]
       date = Date.parse(date_str)
-      next unless (today - date).to_i <= 30
+      next unless (today - date).to_i <= DAYS_TO_KEEP
 
       # pubDateを日記の日付に設定（RSS仕様との整合性のため）
       item.pubDate = date.to_time
