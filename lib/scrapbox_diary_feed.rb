@@ -49,24 +49,37 @@ class ScrapboxDiaryFeed
   private
   def select_diary_items
     today = Date.today
-    original_feed.items.select {|item|
+    diary_tagged_items
+      .map { |item| prepare_diary_item(item, today) }
+      .compact
+      .sort_by { |item, date| -date.to_time.to_i }
+      .map(&:first)
+  end
+
+  def diary_tagged_items
+    original_feed.items.select { |item|
       item.description =~ /#日記/ && item.title !~ /\(WIP\)/
-    }.map {|item|
-      match = item.description.match(/#(\d{4}-\d{2}-\d{2})/)
-      next unless match
-
-      date_str = match[1]
-      date = Date.parse(date_str)
-      next unless (today - date).to_i <= DAYS_TO_KEEP
-
-      # pubDateを日記の日付に設定（RSS仕様との整合性のため）
-      item.pubDate = date.to_time
-      item.title = date_str
-      [item, date]
-    }.compact.sort_by {|item, date|
-      -date.to_time.to_i
-    }.map {|item, date|
-      item
     }
+  end
+
+  def prepare_diary_item(item, today)
+    date = extract_date_from_description(item.description)
+    return nil unless date
+    return nil unless recent?(date, today)
+
+    # pubDateを日記の日付に設定（RSS仕様との整合性のため）
+    item.pubDate = date.to_time
+    item.title = date.strftime('%Y-%m-%d')
+    [item, date]
+  end
+
+  def extract_date_from_description(description)
+    match = description.match(/#(\d{4}-\d{2}-\d{2})/)
+    return nil unless match
+    Date.parse(match[1])
+  end
+
+  def recent?(date, today)
+    (today - date).to_i <= DAYS_TO_KEEP
   end
 end
