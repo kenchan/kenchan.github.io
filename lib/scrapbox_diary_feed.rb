@@ -44,13 +44,11 @@ class ScrapboxDiaryFeed
     @_diary_items ||= original_feed.items.select {|item|
       item.description =~ /#日記/ && item.title !~ /\(WIP\)/
     }.map {|item|
-      # description内の#YYYY-MM-DDタグから日付を抽出
       match = item.description.match(/#(\d{4}-\d{2}-\d{2})/)
       next unless match
 
       date_str = match[1]
       date = Date.parse(date_str)
-      # 過去30日以内の日記のみ
       next unless (today - date).to_i <= 30
 
       # pubDateを日記の日付に設定（RSS仕様との整合性のため）
@@ -58,7 +56,7 @@ class ScrapboxDiaryFeed
       item.title = date_str
       [item, date]
     }.compact.sort_by {|item, date|
-      -date.to_time.to_i  # 日付の降順
+      -date.to_time.to_i
     }.map {|item, date|
       item
     }
