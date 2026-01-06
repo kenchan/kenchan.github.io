@@ -78,17 +78,11 @@ class ScrapboxDiaryFeed
   end
 
   def extract_date_from_item(item)
-    extract_date_from_title(item.title) || extract_date_from_description(item.description)
+    extract_date_from_title(item.title)
   end
 
   def extract_date_from_title(title)
     match = title.match(/^(\d{4}-\d{2}-\d{2})/)
-    return nil unless match
-    Date.parse(match[1])
-  end
-
-  def extract_date_from_description(description)
-    match = description.match(/#(\d{4}-\d{2}-\d{2})/)
     return nil unless match
     Date.parse(match[1])
   end
