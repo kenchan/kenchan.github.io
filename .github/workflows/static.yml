@@ -40,6 +40,10 @@ jobs:
         with:
           ruby-version: 3.2.2
 
+      - name: Run tests
+        run: |
+          rake test
+
       - name: Create dist directory
         run: |
           mkdir -p dist
