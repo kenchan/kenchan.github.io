@@ -58,12 +58,12 @@ class ScrapboxDiaryFeed
 
   def diary_tagged_items
     original_feed.items.select { |item|
-      item.description =~ /#日記/ && item.title !~ /\(WIP\)/
+      has_date_in_title?(item.title) && item.title !~ /\(WIP\)/
     }
   end
 
   def prepare_diary_item(item, today)
-    date = extract_date_from_description(item.description)
+    date = extract_date_from_item(item)
     return nil unless date
     return nil unless recent?(date, today)
 
@@ -71,6 +71,20 @@ class ScrapboxDiaryFeed
     item.pubDate = date.to_time
     item.title = date.strftime('%Y-%m-%d')
     [item, date]
+  end
+
+  def has_date_in_title?(title)
+    title.match?(/^\d{4}-\d{2}-\d{2}/)
+  end
+
+  def extract_date_from_item(item)
+    extract_date_from_title(item.title) || extract_date_from_description(item.description)
+  end
+
+  def extract_date_from_title(title)
+    match = title.match(/^(\d{4}-\d{2}-\d{2})/)
+    return nil unless match
+    Date.parse(match[1])
   end
 
   def extract_date_from_description(description)
