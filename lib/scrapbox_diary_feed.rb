@@ -69,7 +69,6 @@ class ScrapboxDiaryFeed
 
     # pubDateを日記の日付に設定（RSS仕様との整合性のため）
     item.pubDate = date.to_time
-    item.title = date.strftime('%Y-%m-%d')
     [item, date]
   end
 

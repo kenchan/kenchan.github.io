@@ -30,6 +30,15 @@ class TestScrapboxDiaryFeed < Minitest::Test
     refute @feed.send(:recent?, Date.new(2025, 11, 1), today)
   end
 
+  def test_prepare_diary_item_keeps_original_title
+    item = Struct.new(:title, :pubDate).new('2026-01-03: 実家の片付け - kenchan - Cosense', nil)
+
+    prepared_item, = @feed.send(:prepare_diary_item, item, Date.new(2026, 1, 6))
+
+    assert_equal '2026-01-03: 実家の片付け - kenchan - Cosense', prepared_item.title
+    assert_equal Time.new(2026, 1, 3), prepared_item.pubDate
+  end
+
   def test_url
     assert_equal 'https://scrapbox.io/api/feed/test_project', @feed.url
   end
